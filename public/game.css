@@ -1,0 +1,25 @@
+#break-game-ball {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: red;
+    z-index: 11;
+}
+
+#break-game-button {
+
+}
+
+#break-game-score {
+
+}
+
+#break-game-footer {
+
+}
+
+.break-game-element {
+    z-index: 11;
+    background: white;
+}

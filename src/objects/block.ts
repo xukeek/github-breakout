@@ -2,7 +2,7 @@ import { GameObject } from './gameObject'
 import { Rect } from './shape'
 
 export class Block implements GameObject, Rect {
-  blockElement: SVGElement
+  blockElement: HTMLDivElement
 
   left: number
   right: number
@@ -14,12 +14,12 @@ export class Block implements GameObject, Rect {
 
   life: number
 
-  constructor(svgElement: SVGElement, el: SVGElement) {
+  constructor(gameWrapperElement: HTMLDivElement, el: HTMLDivElement) {
     this.blockElement = el
 
     // calculating coordinates in SVG
     const r = el.getBoundingClientRect()
-    const rr = svgElement.getBoundingClientRect()
+    const rr = gameWrapperElement.getBoundingClientRect()
     this.right = r.right - rr.left
     this.left = r.left - rr.left
     this.top = r.top - rr.top
@@ -30,7 +30,9 @@ export class Block implements GameObject, Rect {
     this.originalColor = el.getAttribute('fill') || '#ebedf0'
   }
 
-  update(delta: number) {}
+  update(delta: number) {
+    console.log(delta)
+  }
 
   /**
    * called when hit the ball

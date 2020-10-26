@@ -1,10 +1,9 @@
 import { Ball } from '../objects/ball'
 import { Block } from '../objects/block'
 import { Game } from './game'
-import { Direction, intersectDirection } from '../utils/intersect'
 import { Player } from '../objects/player'
-import { createButton, createDivElement, createShape } from '../utils/domUtils'
-import { getHighScore, saveScore } from '../utils/score'
+import { createDivElementInGameWrapper } from '../utils/domUtils'
+import { getHighScore } from '../utils/score'
 
 enum State {
   Ready,
@@ -20,15 +19,21 @@ export class Breakout extends Game {
   blocks!: Block[]
   player!: Player
 
-  svgElement: SVGElement
   headerElement!: HTMLElement | null
-  button!: HTMLButtonElement
+  button!: HTMLDivElement
   footerElement!: HTMLDivElement
-  scoreElement!: SVGElement
+  scoreElement!: HTMLDivElement
 
-  constructor(svgElement: SVGElement) {
+  gameWrapperElement: HTMLDivElement
+  gameAreaElement: HTMLDivElement
+
+  constructor(
+    gameWrapperElement: HTMLDivElement,
+    gameAreaElement: HTMLDivElement
+  ) {
     super()
-    this.svgElement = svgElement
+    this.gameWrapperElement = gameWrapperElement
+    this.gameAreaElement = gameAreaElement
     ;(async () => {
       this.initGameObject()
       await this.initUI()
@@ -37,36 +42,42 @@ export class Breakout extends Game {
   }
 
   initGameObject() {
-    this.ball = new Ball(this.svgElement)
-    this.player = new Player(this.svgElement)
-    this.blocks = [...this.svgElement.querySelectorAll('rect')]
+    this.ball = new Ball(this.gameWrapperElement, this.gameAreaElement)
+    this.player = new Player(this.gameWrapperElement)
+    this.blocks = [
+      ...this.gameWrapperElement.querySelectorAll<HTMLDivElement>(
+        '.bilibili-player-video-danmaku'
+      ),
+    ]
       .filter((e) => e.getAttribute('data-count') !== '0')
-      .map((e) => new Block(this.svgElement, e))
+      .map((e) => new Block(this.gameWrapperElement, e))
   }
 
   async initUI() {
-    this.scoreElement = this.svgElement.appendChild(
-      createShape('text', { x: 20, y: 130 }, '')
+    this.scoreElement = createDivElementInGameWrapper(
+      this.gameWrapperElement,
+      'break-game-score',
+      ''
     )
 
     this.headerElement = document.querySelector<HTMLElement>(
       '.js-yearly-contributions h2'
     )
 
-    const uiContainer = document.querySelector('.js-calendar-graph')
-    if (!uiContainer) return
-
-    this.button = uiContainer.appendChild(
-      createButton(this.blocks.length > 0 ? `Play!` : '🥺', () =>
-        this.onButtonClick()
-      )
+    this.button = createDivElementInGameWrapper(
+      this.gameWrapperElement,
+      'break-game-button',
+      'Play'
     )
+    this.button.onclick = () => {
+      this.onButtonClick()
+    }
 
     const hs = await getHighScore()
-    this.footerElement = uiContainer.appendChild(
-      createDivElement(
-        hs > 0 ? `HighScore: ${hs}` : 'Press the arrow keys to play ←→'
-      )
+    this.footerElement = createDivElementInGameWrapper(
+      this.gameWrapperElement,
+      'break-game-footer',
+      'Press the arrow keys to play ←→'
     )
   }
 
@@ -80,41 +91,6 @@ export class Breakout extends Game {
     // update objects
     this.ball.update(delta)
     this.player.update(delta)
-    this.blocks.forEach((b) => b.update(delta))
-
-    // TODO reduce the computational cost
-    let remainingContributions = 0
-    this.blocks
-      .filter((b) => b.life > 0)
-      .forEach((b) => {
-        const d = intersectDirection(this.ball, b)
-        // the ball hit the block
-        if (d !== Direction.None) {
-          this.ball.onCollide(d)
-          b.onCollide()
-          this.score += b.origianlLife
-        }
-        remainingContributions += b.life
-      })
-    // the ball hit the bar
-    this.ball.onCollide(intersectDirection(this.ball, this.player))
-
-    // update score label
-    this.updateLabel(remainingContributions)
-
-    // gameover
-    if (this.ball.y > 220) {
-      this.state = State.Done
-      this.button.textContent = 'GameOver!'
-      saveScore(this.score)
-    }
-
-    // clear
-    if (remainingContributions === 0) {
-      this.state = State.Done
-      this.button.textContent = 'Clear!'
-      saveScore(this.score)
-    }
   }
 
   /**

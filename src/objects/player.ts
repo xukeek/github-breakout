@@ -1,6 +1,6 @@
 import { GameObject } from './gameObject'
 import { Rect } from './shape'
-import { createShape } from '../utils/domUtils'
+import { createDivElementInGameWrapper, createShape } from '../utils/domUtils'
 
 /**
  * player
@@ -27,28 +27,18 @@ export class Player implements GameObject, Rect {
     return this.y + this.height
   }
 
-  svg: SVGElement
-  el: SVGElement
+  svg: HTMLDivElement
+  el: HTMLDivElement
 
   vx = 0
 
   isLeftKeyDown = false
   isRightKeyDown = false
 
-  constructor(svg: SVGElement) {
+  constructor(svg: HTMLDivElement) {
     this.svg = svg
-    this.x = this.svg.getBoundingClientRect().width / 2 - this.width / 2
-    this.el = svg.appendChild(
-      createShape('rect', {
-        width: this.right - this.left,
-        height: this.bottom - this.top,
-        x: this.left,
-        y: this.top,
-        rx: 2,
-        ry: 2,
-        fill: 'red',
-      })
-    )
+    this.el = createDivElementInGameWrapper(svg, 'break-game-player', '')
+
     addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') this.isLeftKeyDown = true
       if (e.key === 'ArrowRight') this.isRightKeyDown = true

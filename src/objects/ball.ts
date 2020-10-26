@@ -1,7 +1,6 @@
 import { GameObject } from './gameObject'
 import { Direction } from '../utils/intersect'
 import { Circle } from './shape'
-import { createShape } from '../utils/domUtils'
 
 const speed = 140
 
@@ -9,27 +8,31 @@ const speed = 140
  * ball
  */
 export class Ball implements GameObject, Circle {
-  svgElement: SVGElement
-  ballElement: SVGElement
+  gameWrapperElement: HTMLDivElement
+  gameAreaElement: HTMLDivElement
+  ballElement: HTMLDivElement
 
   x = 0
   y = 185
-  r = 5
+  r = 30
 
   vx = 0
   vy = 0
 
-  constructor(el: SVGElement) {
-    this.svgElement = el
-    this.x = this.svgElement.getBoundingClientRect().width / 2
-    this.ballElement = el.appendChild(
-      createShape('circle', {
-        cx: this.x,
-        cy: this.y,
-        r: this.r,
-        fill: 'red',
-      })
-    )
+  constructor(
+    gameWrapperElement: HTMLDivElement,
+    gameAreaElement: HTMLDivElement
+  ) {
+    this.gameWrapperElement = gameWrapperElement
+    this.gameAreaElement = gameAreaElement
+
+    this.x = this.gameWrapperElement.getBoundingClientRect().width / 2 - this.r
+
+    const ball = document.createElement('div')
+    ball.setAttribute('id', 'break-game-ball')
+    gameWrapperElement.insertBefore(ball, null)
+    this.ballElement = ball
+
     this.vx = speed
     this.vy = -speed
   }
@@ -37,13 +40,16 @@ export class Ball implements GameObject, Circle {
   update(delta: number): void {
     //// prevent the ball to go out of the area
     if (
-      this.x > this.svgElement.getBoundingClientRect().width - this.r ||
-      this.x < this.r
+      this.x > this.gameAreaElement.getBoundingClientRect().width - this.r ||
+      this.x < 0
     ) {
       this.vx *= -1
       this.x += this.vx / Math.abs(this.vx)
     }
-    if (this.y < this.r) {
+    if (
+      this.y > this.gameAreaElement.getBoundingClientRect().height - this.r ||
+      this.y < 0
+    ) {
       this.vy *= -1
       this.y += this.vy / Math.abs(this.vy)
     }
@@ -52,8 +58,10 @@ export class Ball implements GameObject, Circle {
     // calc next position
     this.x = this.x + this.vx * delta
     this.y = this.y + this.vy * delta
-    this.ballElement.setAttribute('cx', this.x.toString())
-    this.ballElement.setAttribute('cy', this.y.toString())
+    this.ballElement.setAttribute(
+      'style',
+      `left: ${this.x}px; top: ${this.y}px`
+    )
   }
 
   /**
@@ -74,11 +82,10 @@ export class Ball implements GameObject, Circle {
   }
 
   reset() {
-    this.x = this.svgElement.getBoundingClientRect().width / 2
+    this.x = this.gameAreaElement.getBoundingClientRect().width / 2 - this.r
     this.y = 185
     this.vx = speed
     this.vy = -speed
-    this.ballElement.setAttribute('cx', this.x.toString())
-    this.ballElement.setAttribute('cy', this.y.toString())
+    this.ballElement.setAttribute('style', `left: ${this.x}; top: ${this.y}`)
   }
 }

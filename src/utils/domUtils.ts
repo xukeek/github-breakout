@@ -37,3 +37,19 @@ export function createDivElement(text: string) {
   el.textContent = text
   return el
 }
+
+/**
+ * create a div element in game wrapper
+ */
+export function createDivElementInGameWrapper(
+  gameWrapper: HTMLDivElement,
+  id: string,
+  text: string
+): HTMLDivElement {
+  const element = document.createElement('div')
+  element.setAttribute('id', id)
+  element.setAttribute('class', 'break-game-element')
+  element.textContent = text
+  gameWrapper.insertBefore(element, null)
+  return element
+}

@@ -4,6 +4,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin'
 
 const webpackConfig: ConfigurationFactory = () => {
   return {
+    mode: 'development',
     entry: {
       main: path.join(__dirname, 'src', 'main.ts'),
     },

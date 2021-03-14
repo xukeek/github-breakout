@@ -24,16 +24,16 @@ export class Breakout extends Game {
   footerElement!: HTMLDivElement
   scoreElement!: HTMLDivElement
 
-  gameWrapperElement: HTMLDivElement
-  gameAreaElement: HTMLDivElement
+  biliPlayerArea: HTMLDivElement
+  biliPlayerVideoWrap: HTMLDivElement
 
   constructor(
-    gameWrapperElement: HTMLDivElement,
-    gameAreaElement: HTMLDivElement
+    biliPlayerArea: HTMLDivElement,
+    biliPlayerVideoWrap: HTMLDivElement
   ) {
     super()
-    this.gameWrapperElement = gameWrapperElement
-    this.gameAreaElement = gameAreaElement
+    this.biliPlayerArea = biliPlayerArea
+    this.biliPlayerVideoWrap = biliPlayerVideoWrap
     ;(async () => {
       this.initGameObject()
       await this.initUI()
@@ -42,20 +42,20 @@ export class Breakout extends Game {
   }
 
   initGameObject() {
-    this.ball = new Ball(this.gameWrapperElement, this.gameAreaElement)
-    this.player = new Player(this.gameWrapperElement)
+    this.ball = new Ball(this.biliPlayerArea, this.biliPlayerVideoWrap)
+    this.player = new Player(this.biliPlayerVideoWrap)
     this.blocks = [
-      ...this.gameWrapperElement.querySelectorAll<HTMLDivElement>(
-        '.bilibili-player-video-danmaku'
+      ...this.biliPlayerArea.querySelectorAll<HTMLDivElement>(
+        '#bilibili-player .b-danmaku'
       ),
     ]
       .filter((e) => e.getAttribute('data-count') !== '0')
-      .map((e) => new Block(this.gameWrapperElement, e))
+      .map((e) => new Block(this.biliPlayerArea, e))
   }
 
   async initUI() {
     this.scoreElement = createDivElementInGameWrapper(
-      this.gameWrapperElement,
+      this.biliPlayerArea,
       'break-game-score',
       ''
     )
@@ -65,7 +65,7 @@ export class Breakout extends Game {
     )
 
     this.button = createDivElementInGameWrapper(
-      this.gameWrapperElement,
+      this.biliPlayerArea,
       'break-game-button',
       'Play'
     )
@@ -75,7 +75,7 @@ export class Breakout extends Game {
 
     const hs = await getHighScore()
     this.footerElement = createDivElementInGameWrapper(
-      this.gameWrapperElement,
+      this.biliPlayerArea,
       'break-game-footer',
       'Press the arrow keys to play ←→'
     )
@@ -112,10 +112,11 @@ export class Breakout extends Game {
    */
   onButtonClick() {
     // Can't play? Let's write the code!
-    if (this.blocks.length === 0) {
-      location.href = 'https://github.com/new'
-      return
-    }
+    // TODO 根据弹幕个数判断
+    // if (this.blocks.length === 0) {
+    //   location.href = 'https://github.com/new'
+    //   return
+    // }
 
     switch (this.state) {
       case State.Ready:
@@ -139,7 +140,7 @@ export class Breakout extends Game {
     let life = 0
     this.blocks.forEach((b) => {
       b.reset()
-      life += b.origianlLife
+      life += b.originalLife
     })
     this.player.reset()
     this.ball.reset()

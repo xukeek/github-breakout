@@ -9,7 +9,7 @@ export class Block implements GameObject, Rect {
   top: number
   bottom: number
 
-  origianlLife: number
+  originalLife: number
   originalColor: string
 
   life: number
@@ -25,8 +25,8 @@ export class Block implements GameObject, Rect {
     this.top = r.top - rr.top
     this.bottom = r.bottom - rr.top
 
-    this.origianlLife = Number(el.getAttribute('data-count'))
-    this.life = this.origianlLife
+    this.originalLife = Number(el.getAttribute('data-count'))
+    this.life = this.originalLife
     this.originalColor = el.getAttribute('fill') || '#ebedf0'
   }
 
@@ -44,8 +44,8 @@ export class Block implements GameObject, Rect {
   }
 
   reset() {
-    this.life = this.origianlLife
+    this.life = this.originalLife
     this.blockElement.setAttribute('fill', this.originalColor)
-    this.blockElement.setAttribute('data-count', this.origianlLife.toString())
+    this.blockElement.setAttribute('data-count', this.originalLife.toString())
   }
 }

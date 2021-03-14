@@ -8,7 +8,7 @@ import { createDivElementInGameWrapper, createShape } from '../utils/domUtils'
 export class Player implements GameObject, Rect {
   x = 0
   y = 190
-  width = 70
+  width = 150
   height = 5
 
   get left() {
@@ -27,7 +27,7 @@ export class Player implements GameObject, Rect {
     return this.y + this.height
   }
 
-  svg: HTMLDivElement
+  biliPlayerVideoWrap: HTMLDivElement
   el: HTMLDivElement
 
   vx = 0
@@ -35,17 +35,21 @@ export class Player implements GameObject, Rect {
   isLeftKeyDown = false
   isRightKeyDown = false
 
-  constructor(svg: HTMLDivElement) {
-    this.svg = svg
-    this.el = createDivElementInGameWrapper(svg, 'break-game-player', '')
+  constructor(biliPlayerVideoWrap: HTMLDivElement) {
+    this.biliPlayerVideoWrap = biliPlayerVideoWrap
+    this.el = createDivElementInGameWrapper(
+      biliPlayerVideoWrap,
+      'break-game-player',
+      ''
+    )
 
     addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') this.isLeftKeyDown = true
-      if (e.key === 'ArrowRight') this.isRightKeyDown = true
+      if (e.key === 'a') this.isLeftKeyDown = true
+      if (e.key === 'd') this.isRightKeyDown = true
     })
     addEventListener('keyup', (e) => {
-      if (e.key === 'ArrowLeft') this.isLeftKeyDown = false
-      if (e.key === 'ArrowRight') this.isRightKeyDown = false
+      if (e.key === 'a') this.isLeftKeyDown = false
+      if (e.key === 'd') this.isRightKeyDown = false
     })
   }
 
@@ -54,11 +58,13 @@ export class Player implements GameObject, Rect {
     else if (this.isLeftKeyDown) this.vx = -300
     else if (this.isRightKeyDown) this.vx = 300
     this.x += this.vx * delta
-    this.el.setAttribute('x', this.x.toString())
+    this.el.style.left = this.x.toString() + 'px'
   }
 
   reset(): void {
-    this.x = this.svg.getBoundingClientRect().width / 2 - this.width / 2
-    this.el.setAttribute('x', this.x.toString())
+    this.x =
+      this.biliPlayerVideoWrap.getBoundingClientRect().width / 2 -
+      this.width / 2
+    this.el.style.left = this.x.toString() + 'px'
   }
 }

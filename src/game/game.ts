@@ -2,16 +2,16 @@
  * Call update on every animation frame
  */
 export abstract class Game {
-  private lastUpdtae = 0
+  private lastUpdate = 0
 
   protected startGameLoop() {
-    this.lastUpdtae = Date.now()
+    this.lastUpdate = Date.now()
     requestAnimationFrame(() => this._update())
   }
 
   _update() {
-    this.update((Date.now() - this.lastUpdtae) / 1000)
-    this.lastUpdtae = Date.now()
+    this.update((Date.now() - this.lastUpdate) / 1000)
+    this.lastUpdate = Date.now()
     requestAnimationFrame(() => this._update())
   }
 

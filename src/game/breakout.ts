@@ -1,9 +1,10 @@
-import { Ball } from '../objects/ball'
-import { Block } from '../objects/block'
-import { Game } from './game'
-import { Player } from '../objects/player'
-import { createDivElementInGameWrapper } from '../utils/domUtils'
-import { getHighScore } from '../utils/score'
+import {Ball} from '../objects/ball'
+import {Block} from '../objects/block'
+import {Game} from './game'
+import {Player} from '../objects/player'
+import {createDivElementInGameWrapper} from '../utils/domUtils'
+import {getHighScore} from '../utils/score'
+import {Direction, intersectDirection} from '../utils/intersect'
 
 enum State {
   Ready,
@@ -42,15 +43,8 @@ export class Breakout extends Game {
   }
 
   initGameObject() {
-    this.ball = new Ball(this.biliPlayerArea, this.biliPlayerVideoWrap)
+    this.ball = new Ball(this.biliPlayerVideoWrap)
     this.player = new Player(this.biliPlayerVideoWrap)
-    this.blocks = [
-      ...this.biliPlayerArea.querySelectorAll<HTMLDivElement>(
-        '#bilibili-player .b-danmaku'
-      ),
-    ]
-      .filter((e) => e.getAttribute('data-count') !== '0')
-      .map((e) => new Block(this.biliPlayerArea, e))
   }
 
   async initUI() {
@@ -91,6 +85,17 @@ export class Breakout extends Game {
     // update objects
     this.ball.update(delta)
     this.player.update(delta)
+    this.biliPlayerArea
+      .querySelectorAll<HTMLDivElement>('#bilibili-player .b-danmaku')
+      .forEach((e) => {
+        const block = new Block(this.biliPlayerVideoWrap, e)
+        const direction = intersectDirection(this.ball, block)
+        this.ball.onCollide(direction)
+        if (direction != Direction.None) {
+          block.onCollide()
+        }
+      })
+    this.ball.onCollide(intersectDirection(this.ball, this.player))
   }
 
   /**
@@ -137,17 +142,11 @@ export class Breakout extends Game {
    */
   async reset() {
     this.state = State.Ready
-    let life = 0
-    this.blocks.forEach((b) => {
-      b.reset()
-      life += b.originalLife
-    })
     this.player.reset()
     this.ball.reset()
     this.score = 0
     this.button.textContent = 'Play!'
     this.scoreElement.textContent = ''
     this.footerElement.textContent = `HighScore: ${await getHighScore()}`
-    this.updateLabel(life)
   }
 }

@@ -29,9 +29,6 @@ export function intersectDirection(c: Circle, r: Rect): Direction {
  */
 export function intersect(c: Circle, r: Rect): boolean {
   return (
-    r.left - c.r < c.x &&
-    c.x < r.right + c.r &&
-    r.top - c.r < c.y &&
-    c.y < r.bottom + c.r
+    c.y + c.r > r.bottom && c.y < r.top && c.x < r.right && c.x + c.r > r.left
   )
 }

@@ -20,10 +20,10 @@ export class Block implements GameObject, Rect {
     // calculating coordinates in SVG
     const r = el.getBoundingClientRect()
     const rr = gameWrapperElement.getBoundingClientRect()
-    this.right = r.right - rr.left
     this.left = r.left - rr.left
-    this.top = r.top - rr.top
-    this.bottom = r.bottom - rr.top
+    this.right = this.left + r.width
+    this.top = rr.height - (r.top - rr.top)
+    this.bottom = this.top - r.height
 
     this.originalLife = Number(el.getAttribute('data-count'))
     this.life = this.originalLife
@@ -39,8 +39,7 @@ export class Block implements GameObject, Rect {
    */
   onCollide() {
     this.life = 0 // breaks at once
-    this.blockElement.setAttribute('fill', '#ebedf0')
-    this.blockElement.setAttribute('data-count', '0')
+    this.blockElement.setAttribute('style', `left: -100px; `)
   }
 
   reset() {

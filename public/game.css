@@ -21,8 +21,6 @@
 
 #break-game-player {
     position: absolute;
-    width: 150px;
-    height: 10px;
     background-color: red;
     border-radius: 3px;
     bottom: 10px;

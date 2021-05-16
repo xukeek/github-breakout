@@ -1,15 +1,15 @@
 import { GameObject } from './gameObject'
 import { Rect } from './shape'
-import { createDivElementInGameWrapper, createShape } from '../utils/domUtils'
+import { createDivElementInGameWrapper } from '../utils/domUtils'
 
 /**
  * player
  */
 export class Player implements GameObject, Rect {
   x = 0
-  y = 190
+  y = 10
   width = 150
-  height = 5
+  height = 10
 
   get left() {
     return this.x
@@ -20,11 +20,11 @@ export class Player implements GameObject, Rect {
   }
 
   get top() {
-    return this.y
+    return this.y + this.height
   }
 
   get bottom() {
-    return this.y + this.height
+    return this.y
   }
 
   biliPlayerVideoWrap: HTMLDivElement
@@ -42,6 +42,9 @@ export class Player implements GameObject, Rect {
       'break-game-player',
       ''
     )
+    this.el.style.width = `${this.width}px`
+    this.el.style.height = `${this.height}px`
+    this.reset()
 
     addEventListener('keydown', (e) => {
       if (e.key === 'a') this.isLeftKeyDown = true
